@@ -158,6 +158,7 @@ require! {
     if it.inverted then @invert! else this
 
   addElse: (@else) -> this
+  addNobreak: (@else) -> @isNobreak = true; this
 
   # Constructs a node that returns the current node's result.
   makeReturn: (arref) ->
@@ -1942,7 +1943,7 @@ class exports.Jump extends Node
     if @label
     then that in (o.labels ?= []) or @carp "unknown label \"#that\""
     else o[@verb]          or @carp "stray #{@verb}"
-    @show! + \;
+    (if o.isNobreak and @verb is \break => "#{o.yet} = false; " else '') + @show! + \;
 
   @extended = !(sub) ->
     sub::children = [\it]
@@ -2039,6 +2040,8 @@ class exports.While extends Node
 
   compileBody: (o) ->
     o.break = o.continue = true
+    o.isNobreak = @isNobreak
+    o.yet = @yet
     {body: {lines}, yet, tab} = this
     code = ret = mid = ''
     empty = if @objComp then '{}' else '[]'
@@ -2068,7 +2071,7 @@ class exports.While extends Node
         lines[*-1]?=makeReturn res = o.scope.assign result-name, empty
       ret += "\n#{@tab}return #{ res or empty };"
       @else?makeReturn!
-    yet and lines.unshift JS "#yet = false;"
+    yet and not @isNobreak and lines.unshift JS "#yet = false;"
     code += "\n#that\n#tab" if @body.compile o, LEVEL_TOP
     code += mid
     code += \}

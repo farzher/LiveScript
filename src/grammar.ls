@@ -259,6 +259,7 @@ bnf =
     # Loops can either be normal with a block of expressions to execute
     # and an optional `else` clause,
     o 'LoopHead Block Else' -> $1.addBody $2 .addElse $3
+    o 'LoopHead Block Nobreak' -> $1.addBody $2 .addNobreak $3
     # postfix with a single expression,
     o 'DO Block WHILE Expression'
     , -> new While($4, $3 is \until, true)addBody $2
@@ -351,6 +352,10 @@ bnf =
     o ''                              -> null
     o 'ELSE Block'                    -> $2
     o 'ELSE IF Expression Block Else' -> If $3, $4, $2 is \unless .addElse $5
+
+  Nobreak:
+    o 'NOBREAK Block' -> $2
+    ...
 
   LoopHead:
     # The source of a `for`-loop is an array, object, or range.

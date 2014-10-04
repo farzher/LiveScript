@@ -247,7 +247,7 @@ exports import
     if tag in <[ THEN IF WHILE ]>
       @fset \for false
       @fset \by false
-    @unline! if tag in <[ RELATION THEN ELSE CASE DEFAULT CATCH FINALLY
+    @unline! if tag in <[ RELATION THEN ELSE NOBREAK CASE DEFAULT CATCH FINALLY
                           IN OF FROM TO BY EXTENDS IMPLEMENTS WHERE ]>
     @token tag, id
     input.length
@@ -970,7 +970,7 @@ character = if not JSON? then uxxxx else ->
   while token = tokens[++i]
     [tag] = token
     continue unless tag in
-      <[ -> THEN ELSE DEFAULT TRY FINALLY DECL ]>
+      <[ -> THEN ELSE NOBREAK DEFAULT TRY FINALLY DECL ]>
     switch next = tokens[i+1]0
     case \IF then continue if tag is \ELSE
     case \INDENT \THEN
@@ -1002,7 +1002,7 @@ character = if not JSON? then uxxxx else ->
     switch t0
     case \NEWLINE       then token.1 is not \;
     case \DOT \? \, \PIPE \BACKPIPE then tokens[i-1]eol
-    case \ELSE          then t is \THEN
+    case \ELSE \NOBREAK then t is \THEN
     case \CATCH         then t is \TRY
     case \FINALLY       then t in <[ TRY CATCH THEN ]>
     case \CASE \DEFAULT then t in <[ CASE THEN ]>
@@ -1131,7 +1131,7 @@ character = if not JSON? then uxxxx else ->
         and tokens[i+3]?0 is \STRNUM
         and tokens[i+4]?0 is \]))
         continue
-      
+
       if tokens[i+2]0 is \BY
         tokens[i+2]0 = \RANGE_BY
       token.op = token.1
@@ -1225,7 +1225,7 @@ function indexOfPair tokens, i
 # Keywords that LiveScript shares in common with JavaScript.
 KEYWORDS_SHARED = <[
   true false null this void super return throw break continue
-  if else for while switch case default try catch finally
+  if else nobreak for while switch case default try catch finally
   function class extends implements new do delete typeof in instanceof
   let with var const import export debugger yield
 ]>
@@ -1322,5 +1322,5 @@ ARG = CHAIN ++ <[ ... UNARY CREMENT PARAM( FUNCTION GENERATOR
                       IF SWITCH TRY CLASS RANGE LABEL DECL DO BIOPBP ]>
 
 # Tokens that expect INDENT on the right.
-BLOCK_USERS = <[ , : -> ELSE ASSIGN IMPORT UNARY DEFAULT TRY FINALLY
+BLOCK_USERS = <[ , : -> ELSE NOBREAK ASSIGN IMPORT UNARY DEFAULT TRY FINALLY
                  HURL DECL DO LET FUNCTION GENERATOR ]>
