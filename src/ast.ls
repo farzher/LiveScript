@@ -1077,7 +1077,7 @@ class exports.Binary extends Node
       switch op
       | \in        => return new In first, second
       | \with      => return new Import (Unary \^^ first), second, false
-      | \<<< \<<<< => return Import first, second, op is \<<<<
+      | \<<< \<<<< => return Import first, second, op == \<<<<
       | \<|        => return Block first .pipe second, op
       | \|>        => return Block second .pipe first, \<|
       | \. \.~     => return Chain first .add Index second, op
@@ -2270,7 +2270,7 @@ class exports.Switch extends Node
     stop  = @default or @cases.length - 1
     o.break = true
     for c, i in @cases
-      code += c.compileCase o, tab, i is stop, (@type is \match or !topic), @type, target
+      code += c.compileCase o, tab, i == stop, (@type is \match or !topic), @type, target
     if @default
       o.indent = tab + TAB
       code += tab + "default:\n#that\n" if @default.compile o, LEVEL_TOP

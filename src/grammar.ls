@@ -176,7 +176,7 @@ bnf =
     o 'Expression Block' -> Cascade $1, $2, \cascade
 
     o 'PARAM( ArgList OptComma )PARAM <- Expression'
-    , -> Call.back $2, $6, $5.charAt(1) is \~, $5.length is 3
+    , -> Call.back $2, $6, $5.charAt(1) == \~, $5.length == 3
 
     o \COMMENT -> L JS $1, true true
 
@@ -208,9 +208,9 @@ bnf =
     , -> Assign $1.unwrap!, Arr.maybe($4), $2
 
     o 'Expression IMPORT Expression'
-    , -> Import $1, $3           , $2 is \<<<<
+    , -> Import $1, $3           , $2 == \<<<<
     o 'Expression IMPORT INDENT ArgList OptComma DEDENT'
-    , -> Import $1, Arr.maybe($4), $2 is \<<<<
+    , -> Import $1, Arr.maybe($4), $2 == \<<<<
 
     o 'CREMENT Chain' -> Unary $1, $2.unwrap!
     o 'Chain CREMENT' -> Unary $2, $1.unwrap!, true
@@ -252,9 +252,9 @@ bnf =
     o 'GENERATOR CALL( ArgList OptComma )CALL Block' -> L Fun($3, $6, false, false, false, true).named $1
 
     # The full complement of `if` and `unless` expressions
-    o 'IF Expression Block Else'      -> If $2, $3, $1 is \unless .addElse $4
+    o 'IF Expression Block Else'      -> If $2, $3, $1 == \unless .addElse $4
     # and their postfix forms.
-    o 'Expression POST_IF Expression' -> If $3, $1, $2 is \unless
+    o 'Expression POST_IF Expression' -> If $3, $1, $2 == \unless
 
     # Loops can either be normal with a block of expressions to execute
     # and an optional `else` clause,
@@ -262,10 +262,10 @@ bnf =
     o 'LoopHead Block Nobreak' -> $1.addBody $2 .addNobreak $3
     # postfix with a single expression,
     o 'DO Block WHILE Expression'
-    , -> new While($4, $3 is \until, true)addBody $2
+    , -> new While($4, $3 == \until, true)addBody $2
     # with a guard
     o 'DO Block WHILE Expression CASE Expression'
-    , -> new While($4, $3 is \until, true)addGuard $6 .addBody $2
+    , -> new While($4, $3 == \until, true)addGuard $6 .addBody $2
 
     # `return` or `throw`.
     o 'HURL Expression'                     -> Jump[$1] $2
@@ -324,8 +324,8 @@ bnf =
     o 'KeyValue LOGIC Expression'  -> Binary $2, $1, $3
     o 'KeyValue ASSIGN Expression' -> Binary $2, $1, $3, true
 
-    o '+- Key'     -> Prop $2.maybeKey!   , L Literal $1 is \+
-    o '+- LITERAL' -> Prop L(Key $2, true), L Literal $1 is \+
+    o '+- Key'     -> Prop $2.maybeKey!   , L Literal $1 == \+
+    o '+- LITERAL' -> Prop L(Key $2, true), L Literal $1 == \+
 
     o '... Expression' -> Splat $2
 
@@ -340,7 +340,7 @@ bnf =
     o 'INDENT Properties OptComma DEDENT'    -> $2
 
   Parenthetical:
-    o '( Body )' -> Parens $2.chomp!unwrap!, false, $1 is \"
+    o '( Body )' -> Parens $2.chomp!unwrap!, false, $1 == \"
     ...
 
   Body:
@@ -403,11 +403,11 @@ bnf =
     o 'FOR ID FROM Expression TO Expression CASE Expression BY Expression'
     , -> new For kind: $1, index: $2, from: $4, op: $5, to: $6, guard: $8, step: $10
 
-    o 'WHILE Expression'                 -> new While $2, $1 is \until
-    o 'WHILE Expression CASE Expression' -> new While $2, $1 is \until .addGuard $4
-    o 'WHILE Expression , Expression'    -> new While $2, $1 is \until, $4
+    o 'WHILE Expression'                 -> new While $2, $1 == \until
+    o 'WHILE Expression CASE Expression' -> new While $2, $1 == \until .addGuard $4
+    o 'WHILE Expression , Expression'    -> new While $2, $1 == \until, $4
     o 'WHILE Expression , Expression CASE Expression'
-    , -> new While $2, $1 is \until, $4 .addGuard $6
+    , -> new While $2, $1 == \until, $4 .addGuard $6
 
   LoopHeads:
     o 'LoopHead'           -> [$1]

@@ -505,7 +505,7 @@ exports import
       @closes.push \)CALL
     case \[ \{
       @adi!
-      @closes.push ']}'charAt val is \{
+      @closes.push ']}'charAt val == \{
     case \}
       if @inter and val is not @closes[*-1]
         @rest = code.slice index+1
@@ -749,7 +749,7 @@ exports import
     @token right, '', callable
 
   # Records a string/number token, supplying implicit dot if applicable.
-  strnum: !-> @token \STRNUM it, @adi! || @last.0 is \DOT
+  strnum: !-> @token \STRNUM it, @adi! || @last.0 == \DOT
 
   # Records a regex token.
   regex: (body, flag) ->
@@ -1027,7 +1027,7 @@ character = if not JSON? then uxxxx else ->
         token.doblock = true
         tokens.splice i, 1
     [tag] = token; prev = tokens[i-1]
-    tag is \[ and brackets.push prev.0 is \DOT
+    tag is \[ and brackets.push prev.0 == \DOT
     if prev.0 is \]
       if brackets.pop! then prev.index = true else continue
     continue unless prev.0 in <[ FUNCTION GENERATOR LET WHERE ]>
@@ -1049,8 +1049,7 @@ character = if not JSON? then uxxxx else ->
     tag = token.0
     return true if tag in <[ POST_IF PIPE BACKPIPE ]>
     unless skipBlock
-      return true if token.alias and token.1 in <[ && || xor ]>
-                  or tag in <[ TO BY IMPLEMENTS ]>
+      return true if token.alias or tag in <[ TO BY IMPLEMENTS ]>
     pre = tokens[i-1]
     switch tag
     case \NEWLINE
